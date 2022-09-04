@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Post;
 
 class PostController extends Controller
 {
@@ -13,7 +14,11 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        $posts = Post::all();
+
+        return response()->json([
+            'posts' => $posts
+        ], 200);
     }
 
     /**
@@ -24,7 +29,16 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $uuid = uniqid();
+        $post = Post::firstOrCreate([
+            'id' => $uuid,
+            'title' => $request->input('title'),
+            'body' => $request->input('body')
+        ]);
+
+        return response()->json([
+            'post' => $post
+        ], 201);
     }
 
     /**
@@ -35,7 +49,11 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        //
+        $post = Post::findOrFail($id);
+
+        return response()->json([
+            'post' => $post
+        ], 200);
     }
 
     /**
@@ -47,7 +65,17 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $post = Post::updateOrCreate(
+            ['id' => $id],
+            [
+                'title' => $request->input('title'),
+                'body' => $request->input('body')
+            ]
+        );
+
+        return response()->json([
+            'post' => $post
+        ], 201);
     }
 
     /**
@@ -58,6 +86,13 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $post = Post::findOrFail($id);
+        $post->delete();
+
+        $posts = Post::all();
+
+        return response()->json([
+            'posts' => $posts
+        ], 201);
     }
 }

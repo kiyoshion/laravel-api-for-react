@@ -9,18 +9,14 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'uid';
+    protected $primaryKey = 'id';
 
     public $incrementing = false;
 
     protected $keyType = 'string';
 
-    protected $hidden = [
-        'id',
-    ];
-
     protected $fillable = [
-        'uid', 'title', 'body',
+        'id', 'title', 'body',
     ];
 
 }

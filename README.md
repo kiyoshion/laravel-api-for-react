@@ -68,3 +68,121 @@ Awesome command!
 ```
 php artisan make:model Post --controller --resource --api
 ```
+
+```app/Models/Post.php
+class Post extends Model
+{
+    use HasFactory;
+
+    protected $primaryKey = 'id';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
+    protected $fillable = [
+        'id', 'title', 'body',
+    ];
+
+}
+```
+
+### Modify migration file
+
+```
+public function up()
+{
+    Schema::create('posts', function (Blueprint $table) {
+        $table->uuid('id')->primary();
+        $table->string('title');
+        $table->text('body');
+        $table->timestamps();
+    });
+}
+```
+
+Then command like this:
+```
+php artisan migrate
+```
+
+## Add CRUD on contoller
+
+### Index
+
+```
+public function index()
+{
+    $posts = Post::all();
+
+    return response()->json([
+        'posts' => $posts
+    ], 200);
+}
+```
+
+### Store
+
+```
+public function store(Request $request)
+{
+    $uuid = uniqid();
+    $post = Post::firstOrCreate([
+        'id' => $uuid,
+        'title' => $request->input('title'),
+        'body' => $request->input('body')
+    ]);
+
+    return response()->json([
+        'post' => $post
+    ], 201);
+}
+```
+
+### Show
+
+```
+public function show($id)
+{
+    $post = Post::findOrFail($id);
+
+    return response()->json([
+        'post' => $post
+    ], 200);
+}
+```
+
+### Update
+
+```
+public function update(Request $request, $id)
+{
+    $post = Post::updateOrCreate(
+        ['id' => $id],
+        [
+            'title' => $request->input('title'),
+            'body' => $request->input('body')
+        ]
+    );
+
+    return response()->json([
+        'post' => $post
+    ], 201);
+}
+```
+
+### Destroy
+
+```
+public function destroy($id)
+{
+    $post = Post::findOrFail($id);
+    $post->delete();
+
+    $posts = Post::all();
+
+    return response()->json([
+        'posts' => $posts
+    ], 201);
+}
+```
